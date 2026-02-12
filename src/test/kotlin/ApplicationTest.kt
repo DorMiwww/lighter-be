@@ -40,6 +40,7 @@ class ApplicationTest {
         application { module() }
         client.get("/lightinfo") {
             header(HttpHeaders.Authorization, "Bearer test-api-key")
+            header(HttpHeaders.Accept, ContentType.Application.Json.toString())
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
         }
