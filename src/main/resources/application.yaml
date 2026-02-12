@@ -4,3 +4,7 @@ ktor:
             - com.dormiwww.ApplicationKt.module
     deployment:
         port: 8080
+
+lighter:
+    router:
+        ping-timeout-seconds: 3

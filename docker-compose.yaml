@@ -1,0 +1,8 @@
+services:
+  lighter:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./secrets.yaml:/app/secrets.yaml:ro
+    restart: unless-stopped

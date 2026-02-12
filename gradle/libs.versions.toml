@@ -3,6 +3,7 @@ koin = "4.1.2-Beta1"
 kotlin = "2.3.0"
 ktor = "3.4.0"
 logback = "1.4.14"
+snakeyaml = "2.3"
 
 [libraries]
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
@@ -20,6 +21,7 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

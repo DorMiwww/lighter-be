@@ -1,5 +1,8 @@
 package com.dormiwww
 
+import com.dormiwww.di.configureFrameworks
+import com.dormiwww.routing.configureRouting
+import com.dormiwww.security.configureSecurity
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -8,9 +11,6 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureFrameworks()
-    configureSerialization()
-    configureMonitoring()
-    configureHTTP()
     configureSecurity()
     configureRouting()
 }
