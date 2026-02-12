@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Lighter API
+  description: API for checking light availability by pinging a router
+  version: 0.0.1
+
+paths:
+  /:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: API is running
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Lighter API
+
+  /lightinfo:
+    get:
+      summary: Check light status
+      description: Pings the router to determine if electricity is available
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Light status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  light:
+                    type: boolean
+                    description: "true = electricity is on, false = no electricity"
+                  checkedAt:
+                    type: integer
+                    format: int64
+                    description: Unix timestamp of the check
+              example:
+                light: true
+                checkedAt: 1739362800
+        "401":
+          description: Missing or invalid API key
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
