@@ -8,3 +8,4 @@ ktor:
 lighter:
     router:
         ping-timeout-seconds: 3
+        port: 80

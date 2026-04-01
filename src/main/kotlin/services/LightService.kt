@@ -3,7 +3,9 @@ package com.dormiwww.services
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import java.util.concurrent.TimeUnit
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.SocketException
 
 @Serializable
 data class LightStatus(
@@ -13,6 +15,7 @@ data class LightStatus(
 
 class LightService(
     private val routerHost: String,
+    private val routerPort: Int,
     private val pingTimeoutSeconds: Int
 ) {
     @Volatile
@@ -23,30 +26,22 @@ class LightService(
         cached?.let { if (now - it.checkedAt < CACHE_TTL_SECONDS) return it }
 
         return withContext(Dispatchers.IO) {
-            val reachable = pingRouter()
+            val reachable = checkRouter()
             LightStatus(light = reachable, checkedAt = now).also { cached = it }
         }
     }
 
-    private fun pingRouter(): Boolean {
+    private fun checkRouter(): Boolean {
         return try {
-            val os = System.getProperty("os.name").lowercase()
-            val command = when {
-                "win" in os -> listOf("ping", "-n", "1", "-w", "${pingTimeoutSeconds * 1000}", routerHost)
-                "mac" in os || "darwin" in os -> listOf("ping", "-c", "1", "-W", "${pingTimeoutSeconds * 1000}", routerHost)
-                else -> listOf("ping", "-c", "1", "-W", "$pingTimeoutSeconds", routerHost)
+            Socket().use { socket ->
+                socket.connect(InetSocketAddress(routerHost, routerPort), pingTimeoutSeconds * 1000)
             }
-            val process = ProcessBuilder(command)
-                .redirectErrorStream(true)
-                .start()
-            val completed = process.waitFor(pingTimeoutSeconds.toLong() + 2, TimeUnit.SECONDS)
-            if (!completed) {
-                process.destroyForcibly()
-                false
-            } else {
-                process.exitValue() == 0
-            }
+            true
+        } catch (_: SocketException) {
+            // Connection refused = router is reachable but no HTTP server
+            true
         } catch (_: Exception) {
+            // Timeout or other error = router not reachable
             false
         }
     }

@@ -10,12 +10,13 @@ import org.koin.logger.slf4jLogger
 fun Application.configureFrameworks() {
     val secrets = loadSecretsConfig(environment.config)
     val pingTimeout = environment.config.property("lighter.router.ping-timeout-seconds").getString().toInt()
+    val routerPort = environment.config.propertyOrNull("lighter.router.port")?.getString()?.toInt() ?: 80
 
     install(Koin) {
         slf4jLogger()
         modules(module {
             single { secrets }
-            single { LightService(secrets.routerHost, pingTimeout) }
+            single { LightService(secrets.routerHost, routerPort, pingTimeout) }
         })
     }
 }
