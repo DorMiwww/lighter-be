@@ -6,7 +6,8 @@ import java.io.File
 
 data class SecretsConfig(
     val apiKey: String,
-    val routerHost: String
+    val routerHost: String,
+    val routerPort: Int = 80
 )
 
 fun loadSecretsConfig(appConfig: ApplicationConfig): SecretsConfig {
@@ -14,9 +15,11 @@ fun loadSecretsConfig(appConfig: ApplicationConfig): SecretsConfig {
     val apiKeyFromConfig = appConfig.propertyOrNull("lighter.api-key")?.getString()
     val routerHostFromConfig = appConfig.propertyOrNull("lighter.router.host")?.getString()
     if (apiKeyFromConfig != null && apiKeyFromConfig.isNotBlank()) {
+        val routerPortFromConfig = appConfig.propertyOrNull("lighter.router.port")?.getString()?.toIntOrNull()
         return SecretsConfig(
             apiKey = apiKeyFromConfig,
-            routerHost = routerHostFromConfig ?: "192.168.1.1"
+            routerHost = routerHostFromConfig ?: "192.168.1.1",
+            routerPort = routerPortFromConfig ?: 80
         )
     }
 
@@ -34,7 +37,8 @@ fun loadSecretsConfig(appConfig: ApplicationConfig): SecretsConfig {
                 "  - Set LIGHTER_API_KEY environment variable"
         )
     val routerHost = System.getenv("LIGHTER_ROUTER_HOST") ?: "192.168.1.1"
-    return SecretsConfig(apiKey = apiKey, routerHost = routerHost)
+    val routerPort = System.getenv("LIGHTER_ROUTER_PORT")?.toIntOrNull() ?: 80
+    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -49,5 +53,6 @@ private fun parseSecretsYaml(file: File): SecretsConfig {
     require(apiKey.isNotBlank()) { "secrets.yaml: 'lighter.api-key' must not be blank" }
 
     val routerHost = (router?.get("host") as? String) ?: "192.168.1.1"
-    return SecretsConfig(apiKey = apiKey, routerHost = routerHost)
+    val routerPort = (router?.get("port") as? Int) ?: 80
+    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort)
 }
