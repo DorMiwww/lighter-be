@@ -23,6 +23,12 @@ class TelegramNotifier(
     private var job: Job? = null
 
     fun start(scope: CoroutineScope) {
+        StateStore.load()?.let { saved ->
+            lastStatus = saved.light
+            lastChangeTime = saved.since
+            log.info("Restored state: light=${saved.light}, since=${saved.since}")
+        }
+
         job = scope.launch(Dispatchers.IO) {
             log.info("Telegram light notifier started (polling every ${POLL_INTERVAL_MS / 1000}s)")
             while (isActive) {
@@ -34,6 +40,7 @@ class TelegramNotifier(
                         sendStatusImage(status.light, now)
                         lastStatus = status.light
                         lastChangeTime = now
+                        StateStore.save(LightState(light = status.light, since = now))
                     }
                 } catch (e: CancellationException) {
                     throw e

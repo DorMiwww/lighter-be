@@ -5,4 +5,8 @@ services:
       - "8080:8080"
     volumes:
       - ./secrets.yaml:/app/secrets.yaml:ro
+      - lighter-data:/app/data
     restart: unless-stopped
+
+volumes:
+  lighter-data:
