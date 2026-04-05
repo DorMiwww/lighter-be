@@ -7,7 +7,9 @@ import java.io.File
 data class SecretsConfig(
     val apiKey: String,
     val routerHost: String,
-    val routerPort: Int = 80
+    val routerPort: Int = 80,
+    val telegramBotToken: String? = null,
+    val telegramChatId: String? = null
 )
 
 fun loadSecretsConfig(appConfig: ApplicationConfig): SecretsConfig {
@@ -36,9 +38,11 @@ fun loadSecretsConfig(appConfig: ApplicationConfig): SecretsConfig {
                 "  - Create secrets.yaml from secrets.yaml.example\n" +
                 "  - Set LIGHTER_API_KEY environment variable"
         )
+    val telegramBotToken = System.getenv("LIGHTER_TELEGRAM_BOT_TOKEN")
+    val telegramChatId = System.getenv("LIGHTER_TELEGRAM_CHAT_ID")
     val routerHost = System.getenv("LIGHTER_ROUTER_HOST") ?: "192.168.1.1"
     val routerPort = System.getenv("LIGHTER_ROUTER_PORT")?.toIntOrNull() ?: 80
-    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort)
+    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort, telegramBotToken = telegramBotToken, telegramChatId = telegramChatId)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -51,8 +55,10 @@ private fun parseSecretsYaml(file: File): SecretsConfig {
     val apiKey = lighter["api-key"] as? String
         ?: error("secrets.yaml: missing 'lighter.api-key'")
     require(apiKey.isNotBlank()) { "secrets.yaml: 'lighter.api-key' must not be blank" }
-
+    val telegram = lighter["telegram"] as? Map<String, Any>
+    val telegramBotToken = telegram?.get("token") as? String
+    val telegramChatId = telegram?.get("chat-id")?.toString()
     val routerHost = (router?.get("host") as? String) ?: "192.168.1.1"
     val routerPort = (router?.get("port") as? Int) ?: 80
-    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort)
+    return SecretsConfig(apiKey = apiKey, routerHost = routerHost, routerPort = routerPort, telegramBotToken = telegramBotToken, telegramChatId = telegramChatId)
 }

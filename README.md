@@ -45,3 +45,5 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
 
+
+curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates" - get chatid and need token from @BotFather
